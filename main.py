@@ -2,13 +2,14 @@ import tkinter as tk
 from tkinter import filedialog
 import random
 import json
+from config import Config
 import os
 
 # Константы
-CELL_SIZE = 10  # Размер клетки
-GRID_WIDTH = 80  # Ширина карты в клетках
-GRID_HEIGHT = 60  # Высота карты в клетках
-UPDATE_INTERVAL = 100  # Интервал обновления (мс)
+CELL_SIZE = Config.CELL_SIZE
+GRID_WIDTH = Config.GRID_WIDTH
+GRID_HEIGHT = Config.GRID_HEIGHT
+UPDATE_INTERVAL = Config.UPDATE_INTERVAL
 
 
 class GameOfLife:
