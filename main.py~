@@ -217,12 +217,13 @@ class GameOfLife:
 
     def update_grid(self):
         """
-        Обработка новой итерации игры
+        Обновление поля - новая итерация игры
         """
         if not self.running:
             return
 
         self.update_canvas()
+        
         self.grid = self.calculate_next_generation()
         self.root.after(UPDATE_INTERVAL, self.update_grid)
 
@@ -241,9 +242,6 @@ class GameOfLife:
                     self.canvas.create_rectangle(x1, y1, x2, y2, fill="black", outline="white")
 
     def calculate_next_generation(self):
-        """
-        Расчет новой итерации игры
-        """
         new_grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
         for y in range(GRID_HEIGHT):
             for x in range(GRID_WIDTH):
@@ -256,9 +254,6 @@ class GameOfLife:
         return new_grid
 
     def count_live_neighbors(self, x, y):
-        """
-        Подсчет количества соседей клетки
-        """
         count = 0
         for dy in [-1, 0, 1]:
             for dx in [-1, 0, 1]:
@@ -270,7 +265,7 @@ class GameOfLife:
         return count
 
 
-if __name__ == "__main__":  # запуск игры
+if __name__ == "__main__":
     root = tk.Tk()
     root.title("Game of Life")
     game = GameOfLife(root)
