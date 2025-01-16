@@ -1,0 +1,78 @@
+import pytest
+import json
+from tkinter import Tk
+from main import GameOfLife, GRID_WIDTH, GRID_HEIGHT
+
+
+@pytest.fixture
+def app():
+    root = Tk()
+    return GameOfLife(root)
+
+
+# Тестирование генерации случайного поля
+def test_random_generation(app):
+    app.random_generation()
+    assert any(
+        any(row) for row in app.grid
+    ), "Random generation should create a non-empty grid."
+
+
+# Тестирование пользовательской генерации
+def test_custom_generation(app):
+    app.custom_generation()
+    assert all(all(cell == 0 for cell in row) for row in app.grid), "Custom generation should create an empty grid."
+
+
+# Тестирование переключения клеток
+def test_toggle_cell(app):
+    app.custom_generation()
+    event_mock = type('Event', (object,), {'x': 5 * 10, 'y': 5 * 10})
+    app.toggle_cell(event_mock)
+    assert app.grid[5][5] == 0, "Cell should be toggled to 0."
+    app.toggle_cell(event_mock)
+    assert app.grid[5][5] == 1, "Cell should be toggled back to 1."
+
+
+# Тестирование подсчета соседей
+def test_count_live_neighbors(app):
+    app.custom_generation()
+    app.grid[5][5] = 1
+    app.grid[5][6] = 1
+    app.grid[6][5] = 1
+    assert app.count_live_neighbors(5, 5) == 2, "Cell should have 2 live neighbors."
+    assert app.count_live_neighbors(6, 6) == 3, "Cell should have 3 live neighbors."
+
+
+# Тестирование расчета следующего поколения
+def test_calculate_next_generation(app):
+    app.custom_generation()
+    app.grid[5][5] = 1
+    app.grid[5][6] = 1
+    app.grid[6][5] = 1
+    new_grid = app.calculate_next_generation()
+    assert new_grid[5][5] == 1, "Cell should remain alive."
+    assert new_grid[6][6] == 1, "Dead cell should become alive."
+
+
+# Тестирование экспорта поля
+def test_export_field(app, tmpdir):
+    app.custom_generation()
+    app.grid[5][5] = 1
+    app.grid[6][6] = 1
+    app.export_field()
+    with open(str(tmpdir / "game_of_life_field_1.json"), 'r') as f:
+        data = json.load(f)
+    assert data["grid_width"] == GRID_WIDTH, "Exported width should match."
+    assert data["grid_height"] == GRID_HEIGHT, "Exported height should match."
+    assert data["grid"][5][5] == 1, "Exported grid should match the current state."
+
+# Тестирование обновления сетки
+def test_update_grid(app):
+    app.custom_generation()
+    app.grid[5][5] = 1
+    app.grid[5][6] = 1
+    app.grid[6][5] = 1
+    app.update_grid()
+    assert app.grid[5][5] == 1, "Cell should remain alive after update."
+    assert app.grid[6][6] == 1, "Cell should become alive after update."
